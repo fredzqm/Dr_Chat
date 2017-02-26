@@ -36,19 +36,25 @@ namespace Bot_Application1
                 Debug.WriteLine(luisObj);
                 if (luisObj.topScoringIntent != null)
                 {
+                    List<string> entityList = luisObj.getList();
+                    String gender = "male";
+                    int year = 1995;
                     switch (luisObj.topScoringIntent.intent) 
                     {
                         case "Diagnose":
-                            List<string> mylist = luisObj.getList();
-                            if (mylist.Count == 0)
-                                break;
-                            foreach(string s in mylist)
-                                Debug.WriteLine(s);
-                            answer = medic.getDiagonoses(mylist, "male", 1995);
+                            answer = medic.getDiagonoses(entityList, gender, year);
+                            break;
+                        case "SeekingTreatments":
+                            answer = medic.getTreatments(entityList);
+                            break;
+                        case "SeekiingSymptoms":
+                            break;
+                        case "Greetings":
+                            break;
+                        case "EndChat":
                             break;
                         case "None":
                             break;
-
                     }
                 }
                 Activity reply = activity.CreateReply(answer);

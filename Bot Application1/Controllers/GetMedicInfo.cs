@@ -22,26 +22,36 @@ namespace Bot_Application1
 
         public MedicInfo()
         {
-            string url = String.Format("{0}symptoms?token={1}{2}", base_url, token, meta);
-            var response = getRespons(url);
-            var content = response.Content;
-            var symList = JsonConvert.DeserializeObject<List<MedicObject>>(content);
+            List<MedicObject> symList = getRespons<MedicObject>("symptoms?");
             foreach (MedicObject sym in symList)
             {
                 symptoms2id.Add(sym.Name.ToLowerInvariant(), sym.ID);
             }
         }
 
-        private IRestResponse getRespons(String url)
+        private List<T> getRespons<T>(String url)
         {
+            url = String.Format("{0}{1}token={2}{3}", base_url, url, token, meta);
+            Debug.WriteLine(url);
             var client = new RestClient(url);
             var request = new RestRequest("", Method.GET);
             IRestResponse response = client.Execute(request);
-            return response;
-         
+            var content = response.Content;
+            return JsonConvert.DeserializeObject<List<T>>(content);
         }
 
-        public String getDiagonoses(List<String> symptoms, string gender, int yearOfBirth)
+        public string getTreatments(List<string> entityList)
+        {
+            if (entityList.Count == 0)
+                return "We don't know your issues";
+            var issueId = issues2id[entityList[0]];
+            String treatement_url = "issues/" + issueId + "/info?";
+            var symList = getRespons<IssueInfo>(treatement_url);
+            return symList[0].TreatmentDescription;
+        }
+
+
+    public String getDiagonoses(List<String> symptoms, string gender, int yearOfBirth)
         {
             String symptomIdList = "";
             for (var i = 0; i < symptoms.Count; i++)
@@ -64,18 +74,9 @@ namespace Bot_Application1
                 return "Cannot diagnose the issue, please enter symptoms in one of the given list";
             }
 
-            string diagnose_url = String.Format("{0}diagnosis?symptoms=[{1}]&gender={2}&year_of_birth={3}&token={4}{5}",
-                base_url, symptomIdList,  gender, yearOfBirth, token, meta);
+            string diagnose_url = String.Format("diagnosis?symptoms=[{0}]&gender={1}&year_of_birth={2}", symptomIdList, gender, yearOfBirth);
 
-            return parseDiagnosis(diagnose_url);
-        }
-
-
-        private string parseDiagnosis(String diagnose_url)
-        {
-            var response = getRespons(diagnose_url);
-            var content = response.Content;
-            var symList = JsonConvert.DeserializeObject<List<Diagnose>>(content);
+            List<Diagnose> symList = getRespons<Diagnose>(diagnose_url);
             return symList[0].Issue.Name;
         }
 
@@ -87,25 +88,12 @@ namespace Bot_Application1
                 var issueId = issues2id[issue];
 
                 return null;
-            } else
+            }
+            else
             {
                 return "Cannot find the issue, please describe your symptoms";
             }
-           
-        }
-
-
-        public String getTreatment(String issue)
-        {
-            var issueId = issues2id[issue];
-            String treatement_url = base_url+"issues/80/info?"+token+meta;
-            var response = getRespons(treatement_url);
-            var content = response.Content;
-            var symList = JsonConvert.DeserializeObject<List<IssueInfo>>(content);
-            return symList[0].TreatmentDescription;
 
         }
-
-
     }
 }
