@@ -79,6 +79,7 @@ namespace Bot_Application1
             return parseDiagnosis(diagnose_url);
         }
 
+
         private string parseDiagnosis(String diagnose_url)
         {
             var response = getRespons(diagnose_url);
@@ -102,6 +103,18 @@ namespace Bot_Application1
            
         }
 
-        
+
+        public String getTreatment(String issue)
+        {
+            var issueId = issues2id[issue];
+            String treatement_url = base_url+"issues/80/info?"+token+meta;
+            var response = getRespons(treatement_url);
+            var content = response.Content;
+            var symList = JsonConvert.DeserializeObject<List<IssueInfo>>(content);
+            return symList[0].TreatmentDescription;
+
+        }
+
+
     }
 }
