@@ -42,7 +42,7 @@ namespace Bot_Application1
                     switch (luisObj.topScoringIntent.intent) 
                     {
                         case "Diagnose":
-                            answer = medic.getDiagonoses(entityList, gender, year);
+                            answer = "You might be having a " + (medic.getDiagonoses(entityList, gender, year)).ToLower()+".";
                             break;
                         case "SeekingTreatments":
                             answer = medic.getTreatments(entityList);

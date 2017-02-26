@@ -10,7 +10,7 @@ namespace Bot_Application1
 {
     public class LUISClient
     {
-        const string luisURL = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/666e81f3-21dd-44e8-b8ef-b94723adb5a4?subscription-key=476c0b3d0fae4edca23e5657e6202e46";
+        const string luisURL = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/666e81f3-21dd-44e8-b8ef-b94723adb5a4?subscription-key=30168a99da494d81994f7830c874230f";
         public static async Task<Luis> ParseUserInput(string strInput)
         {
 
