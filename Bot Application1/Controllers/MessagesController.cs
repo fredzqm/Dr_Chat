@@ -50,8 +50,10 @@ namespace Bot_Application1
                         case "SeekiingSymptoms":
                             break;
                         case "Greetings":
+                            answer = "Hello!";
                             break;
                         case "EndChat":
+                            answer = "Bye!";
                             break;
                         case "None":
                             break;
