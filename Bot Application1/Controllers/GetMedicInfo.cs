@@ -44,8 +44,8 @@ namespace Bot_Application1
             {
                 return;
             }
-            var symList = JsonConvert.DeserializeObject<List<Symptom>>(content);
-            foreach (Symptom sym in symList)
+            var symList = JsonConvert.DeserializeObject<List<MedicObject>>(content);
+            foreach (MedicObject sym in symList)
             {
                 symptoms2id.Add(sym.Name.ToLowerInvariant(), sym.ID);
             }

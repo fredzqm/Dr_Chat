@@ -7,7 +7,7 @@ using System.Web.Routing;
 
 namespace Bot_Application1.Models
 {
-    public class Symptom
+    public class MedicObject
     {
         public int ID { get; set; }
         public string Name { get; set; }
