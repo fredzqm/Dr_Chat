@@ -24,10 +24,15 @@ namespace Bot_Application1
         public MedicInfo()
         {
             populateToken();
-            List<MedicObject> symList = getRespons<MedicObject>("symptoms?");
+            List<MedicObject> symList = getRespons<List<MedicObject>>("symptoms?");
             foreach (MedicObject sym in symList)
             {
                 symptoms2id.Add(sym.Name.ToLowerInvariant(), sym.ID);
+            }
+            symList = getRespons<List<MedicObject>>("issues?");
+            foreach (MedicObject sym in symList)
+            {
+                issues2id.Add(sym.Name.ToLowerInvariant(), sym.ID);
             }
         }
 
@@ -52,7 +57,7 @@ namespace Bot_Application1
             }
         }
 
-        private List<T> getRespons<T>(String url)
+        private T getRespons<T>(String url)
         {
             url = String.Format("{0}{1}token={2}{3}", base_url, url, token, meta);
             Debug.WriteLine(url);
@@ -60,7 +65,8 @@ namespace Bot_Application1
             var request = new RestRequest("", Method.GET);
             IRestResponse response = client.Execute(request);
             var content = response.Content;
-            return JsonConvert.DeserializeObject<List<T>>(content);
+            Debug.WriteLine(content);
+            return JsonConvert.DeserializeObject<T>(content);
         }
 
         public string getTreatments(List<string> entityList)
@@ -69,8 +75,8 @@ namespace Bot_Application1
                 return "We don't know your issues";
             var issueId = issues2id[entityList[0]];
             String treatement_url = "issues/" + issueId + "/info?";
-            var symList = getRespons<IssueInfo>(treatement_url);
-            return symList[0].TreatmentDescription;
+            IssueInfo treatment = getRespons<IssueInfo>(treatement_url);
+            return treatment.TreatmentDescription;
         }
 
 
@@ -99,7 +105,7 @@ namespace Bot_Application1
 
             string diagnose_url = String.Format("diagnosis?symptoms=[{0}]&gender={1}&year_of_birth={2}&", symptomIdList, gender, yearOfBirth);
 
-            List<Diagnose> symList = getRespons<Diagnose>(diagnose_url);
+            List<Diagnose> symList = getRespons<List<Diagnose>>(diagnose_url);
             return symList[0].Issue.Name;
         }
 
