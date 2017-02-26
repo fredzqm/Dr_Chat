@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Bot_Application1;
 using Bot_Application1.Models;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Bot_Application1
 {
@@ -32,12 +33,13 @@ namespace Bot_Application1
                 string answer = "Hmmmm, I didn't understand that.  I'm still learning!";
                 string token = activity.Text.ToLower().Trim();
                 Luis luisObj = await LUISClient.ParseUserInput(activity.Text);
+                Debug.WriteLine(luisObj);
                 if (luisObj.topScoringIntent != null)
                 {
                     switch (luisObj.topScoringIntent.intent) 
                     {
                         case "Diagnose":
-                            List<string> mylist = new List<string>(new string[] { "fever", "cough" });
+                            List<string> mylist = luisObj.getList();
                             answer = medic.getDiagonoses(mylist, "male", 1995);
                             break;
                         case "None":

@@ -134,8 +134,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Diagnose.cs" />
+    <Compile Include="Models\IssueInfo.cs" />
     <Compile Include="Models\LuisModel.cs" />
-    <Compile Include="Models\Symptom.cs" />
+    <Compile Include="Models\MedicObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ValuesController1.cs" />
   </ItemGroup>
