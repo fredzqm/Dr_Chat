@@ -13,7 +13,7 @@ namespace Bot_Application1
         const string luisURL = "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/666e81f3-21dd-44e8-b8ef-b94723adb5a4?subscription-key=476c0b3d0fae4edca23e5657e6202e46";
         public static async Task<Luis> ParseUserInput(string strInput)
         {
-            
+
             string strEscaped = Uri.EscapeDataString(strInput);
 
             using (var client = new HttpClient())
@@ -22,18 +22,18 @@ namespace Bot_Application1
                 // TODO: insert your LUIS URL here
                 string uri = luisURL + "&q=" + strEscaped;
                 HttpResponseMessage msg = await client.GetAsync(uri);
-                
+
                 if (msg.IsSuccessStatusCode)
                 {
                     var jsonResponse = await msg.Content.ReadAsStringAsync();
                     Luis _Data = JsonConvert.DeserializeObject<Luis>(jsonResponse);
                     return _Data;
-                }else
+                }
+                else
                 {
                     throw new Exception("Lui service is not running at " + luisURL);
                 }
             }
-            return null;
         }
     }
 
@@ -76,13 +76,31 @@ namespace Bot_Application1
         public TopScoringIntent topScoringIntent { get; set; }
         public List<Intent> intents { get; set; }
         public List<Entity> entities { get; set; }
-        public override string ToString() {
-            return String.Format("Queries:{0}\ntopScoring:{1}\nintent:{2}\nentities:{3}", query, topScoringIntent, intents, entities);
+        public override string ToString()
+        {
+            String a = "";
+            if (intents == null)
+                a = null;
+            else
+                foreach (Intent i in intents)
+                    a += i.ToString();
+            String b = "";
+            if (entities == null)
+                b = null;
+            else
+                foreach (Entity i in entities)
+                    b += i.ToString();
+            return String.Format("Queries:{0}\ntopScoring:{1}\nintent:{2}\nentities:{3}", query, topScoringIntent, a, b);
         }
 
         internal List<string> getList()
         {
-           return new List<string>(new string[] { "fever", "cough" });
+            List<String> ls = new List<string>();
+            foreach (Entity e in entities)
+            {
+                ls.Add(e.entity);
+            }
+            return ls;
         }
     }
 

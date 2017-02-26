@@ -40,6 +40,10 @@ namespace Bot_Application1
                     {
                         case "Diagnose":
                             List<string> mylist = luisObj.getList();
+                            if (mylist.Count == 0)
+                                break;
+                            foreach(string s in mylist)
+                                Debug.WriteLine(s);
                             answer = medic.getDiagonoses(mylist, "male", 1995);
                             break;
                         case "None":
