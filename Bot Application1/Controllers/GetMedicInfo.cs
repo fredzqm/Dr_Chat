@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Net;
-using System.IO;
 using RestSharp;
 using Newtonsoft.Json;
 using Bot_Application1.Models;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Bot_Application1
 {
@@ -17,15 +18,37 @@ namespace Bot_Application1
         Dictionary<string, int> symptoms2id = new Dictionary<string, int>();
         Dictionary<String, int> issues2id = new Dictionary<string, int>();
         const string base_url = "https://sandbox-healthservice.priaid.ch/";
-        const string token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InJvbGxpbmsueWFuZ0BnbWFpbC5jb20iLCJyb2xlIjoiVXNlciIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL3NpZCI6IjEyMzEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3ZlcnNpb24iOiIyMDAiLCJodHRwOi8vZXhhbXBsZS5vcmcvY2xhaW1zL2xpbWl0IjoiOTk5OTk5OTk5IiwiaHR0cDovL2V4YW1wbGUub3JnL2NsYWltcy9tZW1iZXJzaGlwIjoiUHJlbWl1bSIsImh0dHA6Ly9leGFtcGxlLm9yZy9jbGFpbXMvbGFuZ3VhZ2UiOiJlbi1nYiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvZXhwaXJhdGlvbiI6IjIwOTktMTItMzEiLCJodHRwOi8vZXhhbXBsZS5vcmcvY2xhaW1zL21lbWJlcnNoaXBzdGFydCI6IjIwMTctMDItMjUiLCJpc3MiOiJodHRwczovL3NhbmRib3gtYXV0aHNlcnZpY2UucHJpYWlkLmNoIiwiYXVkIjoiaHR0cHM6Ly9oZWFsdGhzZXJ2aWNlLnByaWFpZC5jaCIsImV4cCI6MTQ4ODA5MDkxOCwibmJmIjoxNDg4MDgzNzE4fQ.wfqf5JreH1SOsxLqm35MAZR2yFBAJjra8pPk2Y_XG4g";
         const string meta = "&language=en-gb&format=json";
+        string token = "";
 
         public MedicInfo()
         {
+            populateToken();
             List<MedicObject> symList = getRespons<MedicObject>("symptoms?");
             foreach (MedicObject sym in symList)
             {
                 symptoms2id.Add(sym.Name.ToLowerInvariant(), sym.ID);
+            }
+        }
+
+        private void populateToken()
+        {
+            string uri = "https://sandbox-authservice.priaid.ch/login";
+            string api_key = "rollink.yang@gmail.com";
+            string secret_key = "Qw42JsFt8f3B6Nig9";
+            byte[] secretBytes = Encoding.UTF8.GetBytes(secret_key);
+            string computedHashString = "";
+            using (System.Security.Cryptography.HMACMD5 hmac = new HMACMD5(secretBytes))
+            {
+                byte[] dataBytes = Encoding.UTF8.GetBytes(uri);
+                byte[] computedHash = hmac.ComputeHash(dataBytes);
+                computedHashString = Convert.ToBase64String(computedHash);
+            }
+
+            using (WebClient client = new WebClient())
+            {
+                client.Headers["Authorization"] = string.Concat("Bearer ", api_key, ":", computedHashString);
+                token = JsonConvert.DeserializeObject<Dictionary<string, string>>(client.UploadString(uri, "POST", ""))["Token"];
             }
         }
 
@@ -74,7 +97,7 @@ namespace Bot_Application1
                 return "Cannot diagnose the issue, please enter symptoms in one of the given list";
             }
 
-            string diagnose_url = String.Format("diagnosis?symptoms=[{0}]&gender={1}&year_of_birth={2}", symptomIdList, gender, yearOfBirth);
+            string diagnose_url = String.Format("diagnosis?symptoms=[{0}]&gender={1}&year_of_birth={2}&", symptomIdList, gender, yearOfBirth);
 
             List<Diagnose> symList = getRespons<Diagnose>(diagnose_url);
             return symList[0].Issue.Name;
