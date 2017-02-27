@@ -39,8 +39,8 @@ namespace Bot_Application1
         private void populateToken()
         {
             string uri = "https://sandbox-authservice.priaid.ch/login";
-            string api_key = "rollink.yang@gmail.com";
-            string secret_key = "Qw42JsFt8f3B6Nig9";
+            string api_key = "TODO- add this";
+            string secret_key = "TODO - add this";
             byte[] secretBytes = Encoding.UTF8.GetBytes(secret_key);
             string computedHashString = "";
             using (System.Security.Cryptography.HMACMD5 hmac = new HMACMD5(secretBytes))
